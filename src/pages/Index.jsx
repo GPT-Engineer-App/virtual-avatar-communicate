@@ -1,8 +1,66 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Container, Box, VStack, Text, Button, HStack, IconButton } from "@chakra-ui/react";
+import { Container, Box, VStack, Text, Button, HStack, IconButton, useToast } from "@chakra-ui/react";
 import { FaVideo, FaMicrophone, FaMicrophoneSlash, FaVideoSlash } from "react-icons/fa";
 
 const Index = () => {
+  const [transcribedText, setTranscribedText] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const toast = useToast();
+
+  const handleSpeechRecognition = () => {
+    if (!("webkitSpeechRecognition" in window)) {
+      toast({
+        title: "Speech Recognition not supported",
+        description: "Your browser does not support speech recognition.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      let interimTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          setTranscribedText((prev) => prev + event.results[i][0].transcript);
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      setTranscribedText((prev) => prev + interimTranscript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error", event);
+      toast({
+        title: "Speech Recognition Error",
+        description: event.error,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  };
   const videoRef = useRef(null);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
@@ -47,10 +105,15 @@ const Index = () => {
           </Box>
         </HStack>
         <HStack spacing={4} mt={4}>
+          <Button onClick={handleSpeechRecognition}>{isListening ? "Stop Listening" : "Start Listening"}</Button>
           <IconButton aria-label="Toggle Video" icon={isVideoOn ? <FaVideo /> : <FaVideoSlash />} onClick={toggleVideo} />
           <IconButton aria-label="Toggle Audio" icon={isAudioOn ? <FaMicrophone /> : <FaMicrophoneSlash />} onClick={toggleAudio} />
         </HStack>
       </VStack>
+      <Box mt={4} p={4} bg="gray.100" borderRadius="md" width="100%">
+        <Text fontSize="lg">Transcribed Text:</Text>
+        <Text>{transcribedText}</Text>
+      </Box>
     </Container>
   );
 };
