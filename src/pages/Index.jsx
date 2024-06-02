@@ -129,26 +129,6 @@ const Index = () => {
         <Text fontSize="lg">AI Response:</Text>
         <Text>{aiResponse}</Text>
       </Box>
-      <VStack spacing={4} width="100%">
-        <Text fontSize="2xl">Virtual Avatar Video Call</Text>
-        <HStack spacing={4} width="100%" justifyContent="center">
-          <Box width="50%" bg="gray.200" borderRadius="md" overflow="hidden">
-            <video ref={videoRef} autoPlay playsInline width="100%" />
-          </Box>
-          <Box width="50%" bg="gray.200" borderRadius="md" display="flex" justifyContent="center" alignItems="center">
-            <Text>Virtual Avatar Placeholder</Text>
-          </Box>
-        </HStack>
-        <HStack spacing={4} mt={4}>
-          <Button onClick={handleSpeechRecognition}>{isListening ? "Stop Listening" : "Start Listening"}</Button>
-          <IconButton aria-label="Toggle Video" icon={isVideoOn ? <FaVideo /> : <FaVideoSlash />} onClick={toggleVideo} />
-          <IconButton aria-label="Toggle Audio" icon={isAudioOn ? <FaMicrophone /> : <FaMicrophoneSlash />} onClick={toggleAudio} />
-        </HStack>
-      </VStack>
-      <Box mt={4} p={4} bg="gray.100" borderRadius="md" width="100%">
-        <Text fontSize="lg">Transcribed Text:</Text>
-        <Text>{transcribedText}</Text>
-      </Box>
     </Container>
   );
 };
