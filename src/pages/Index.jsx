@@ -41,7 +41,6 @@ const Index = () => {
       let interimTranscript = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          setTranscribedText((prev) => prev + event.results[i][0].transcript);
           const finalTranscript = event.results[i][0].transcript;
           setTranscribedText((prev) => prev + finalTranscript);
           const response = await handleAIResponse(finalTranscript);
