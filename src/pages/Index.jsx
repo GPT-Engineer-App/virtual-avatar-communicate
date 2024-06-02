@@ -30,16 +30,24 @@ const Index = () => {
     };
 
     const handleAIResponse = async (text) => {
-      const response = await fetch("https://api.example.com/ai-response", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ question: text }),
-      });
-      const data = await response.json();
-      console.log("AI Response Data:", data);
-      return data.answer;
+      try {
+        const response = await fetch("https://api.example.com/ai-response", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question: text }),
+        });
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        console.log("AI Response Data:", data);
+        return data.answer;
+      } catch (error) {
+        console.error("Error fetching AI response:", error);
+        return "Error fetching AI response";
+      }
     };
 
     recognition.onresult = async (event) => {
@@ -50,6 +58,8 @@ const Index = () => {
           setTranscribedText((prev) => prev + finalTranscript);
           const response = await handleAIResponse(finalTranscript);
           setAiResponse(response);
+        } else {
+          interimTranscript += event.results[i][0].transcript;
         }
       }
       setTranscribedText((prev) => prev + interimTranscript);
