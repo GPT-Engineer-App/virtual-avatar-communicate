@@ -30,11 +30,15 @@ const Index = () => {
     };
 
     const handleAIResponse = async (text) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(`AI Response to: ${text}`);
-        }, 1000);
+      const response = await fetch("https://api.example.com/ai-response", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: text }),
       });
+      const data = await response.json();
+      return data.answer;
     };
 
     recognition.onresult = async (event) => {
