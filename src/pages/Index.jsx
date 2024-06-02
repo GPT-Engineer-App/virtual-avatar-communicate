@@ -3,6 +3,7 @@ import { Container, Box, VStack, Text, Button, HStack, IconButton, useToast } fr
 import { FaVideo, FaMicrophone, FaMicrophoneSlash, FaVideoSlash } from "react-icons/fa";
 
 const Index = () => {
+  const [aiResponse, setAiResponse] = useState("");
   const [transcribedText, setTranscribedText] = useState("");
   const [isListening, setIsListening] = useState(false);
   const toast = useToast();
@@ -28,13 +29,23 @@ const Index = () => {
       setIsListening(true);
     };
 
-    recognition.onresult = (event) => {
+    const handleAIResponse = async (text) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(`AI Response to: ${text}`);
+        }, 1000);
+      });
+    };
+
+    recognition.onresult = async (event) => {
       let interimTranscript = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
           setTranscribedText((prev) => prev + event.results[i][0].transcript);
-        } else {
-          interimTranscript += event.results[i][0].transcript;
+          const finalTranscript = event.results[i][0].transcript;
+          setTranscribedText((prev) => prev + finalTranscript);
+          const response = await handleAIResponse(finalTranscript);
+          setAiResponse(response);
         }
       }
       setTranscribedText((prev) => prev + interimTranscript);
@@ -94,6 +105,30 @@ const Index = () => {
 
   return (
     <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+      <VStack spacing={4} width="100%">
+        <Text fontSize="2xl">Virtual Avatar Video Call</Text>
+        <HStack spacing={4} width="100%" justifyContent="center">
+          <Box width="50%" bg="gray.200" borderRadius="md" overflow="hidden">
+            <video ref={videoRef} autoPlay playsInline width="100%" />
+          </Box>
+          <Box width="50%" bg="gray.200" borderRadius="md" display="flex" justifyContent="center" alignItems="center">
+            <Text>Virtual Avatar Placeholder</Text>
+          </Box>
+        </HStack>
+        <HStack spacing={4} mt={4}>
+          <Button onClick={handleSpeechRecognition}>{isListening ? "Stop Listening" : "Start Listening"}</Button>
+          <IconButton aria-label="Toggle Video" icon={isVideoOn ? <FaVideo /> : <FaVideoSlash />} onClick={toggleVideo} />
+          <IconButton aria-label="Toggle Audio" icon={isAudioOn ? <FaMicrophone /> : <FaMicrophoneSlash />} onClick={toggleAudio} />
+        </HStack>
+      </VStack>
+      <Box mt={4} p={4} bg="gray.100" borderRadius="md" width="100%">
+        <Text fontSize="lg">Transcribed Text:</Text>
+        <Text>{transcribedText}</Text>
+      </Box>
+      <Box mt={4} p={4} bg="gray.100" borderRadius="md" width="100%">
+        <Text fontSize="lg">AI Response:</Text>
+        <Text>{aiResponse}</Text>
+      </Box>
       <VStack spacing={4} width="100%">
         <Text fontSize="2xl">Virtual Avatar Video Call</Text>
         <HStack spacing={4} width="100%" justifyContent="center">
