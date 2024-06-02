@@ -40,7 +40,6 @@ const Index = () => {
       const data = await response.json();
       console.log("AI Response Data:", data);
       return data.answer;
-      return data.answer;
     };
 
     recognition.onresult = async (event) => {
@@ -50,7 +49,6 @@ const Index = () => {
           const finalTranscript = event.results[i][0].transcript;
           setTranscribedText((prev) => prev + finalTranscript);
           const response = await handleAIResponse(finalTranscript);
-          console.log("AI Response:", response);
           console.log("AI Response:", response);
           setAiResponse(response);
         }
