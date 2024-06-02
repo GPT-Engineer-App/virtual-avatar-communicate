@@ -49,7 +49,6 @@ const Index = () => {
           const finalTranscript = event.results[i][0].transcript;
           setTranscribedText((prev) => prev + finalTranscript);
           const response = await handleAIResponse(finalTranscript);
-          console.log("AI Response:", response);
           setAiResponse(response);
         }
       }
